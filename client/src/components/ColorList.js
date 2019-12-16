@@ -10,6 +10,7 @@ const ColorList = ({ colors, updateColors }) => {
   // console.log(colors);
   const [editing, setEditing] = useState(false);
   const [colorToEdit, setColorToEdit] = useState(initialColor);
+  const [newColor, setNewColor] = useState(initialColor);
 
   const editColor = color => {
     setEditing(true);
@@ -47,6 +48,33 @@ const ColorList = ({ colors, updateColors }) => {
       .catch(err => console.log(err.message))
   };
 
+
+  //stretch functions
+  const handleChange = e => {
+    e.preventDefault();
+    console.log(e.target.name)
+    if(e.target.name.includes('code')) {
+      setNewColor({...newColor, [e.target.name] : { hex: e.target.value}})
+    }
+    else {
+      setNewColor({...newColor, [e.target.name] : e.target.value})
+    }
+      
+    
+  }
+
+  const handleSubmit = e => {
+    e.preventDefault();
+    axiosWithAuth() 
+      .post(`colors`, newColor)
+      .then(res => {
+        console.log(res)
+        updateColors([...colors, newColor])
+      })
+      .catch(err => {
+        console.log(err.message)
+      })
+  }
   return (
     <div className="colors-wrap">
       <p>colors</p>
@@ -100,8 +128,29 @@ const ColorList = ({ colors, updateColors }) => {
           </div>
         </form>
       )}
+      <form onSubmit={handleSubmit}>
+        <legend>Add Color</legend>
+        <label>
+          color name:
+              <input 
+                  type="text"
+                  name="color"
+                  value={newColor.color}
+                  onChange={handleChange}
+              />
+        </label>
+        <label>
+          color hex:
+              <input 
+                type="text"
+                name="code"
+                value={newColor.code.hex}
+                onChange={handleChange}
+              />
+        </label>
+        <button type='submit' className="button-add">Add Color</button>
+      </form>
       <div className="spacer" />
-      {/* stretch - build another form here to add a color */}
     </div>
   );
 };
